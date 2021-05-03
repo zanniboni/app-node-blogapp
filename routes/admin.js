@@ -8,6 +8,8 @@ const mongoose = require('mongoose')
 // --- Importação de models
 require("../models/Categoria")
 const Categoria = mongoose.model("categorias")
+require("../models/Postagem")
+const Postagem = mongoose.model("postagens")
 // --- Fim da importação de models
 
 
@@ -131,5 +133,116 @@ router.post("/categorias/deletar", (req, res) => {
     })
 })
 
+
+// Rota para postagens
+router.get("/postagens", (req, res) => {
+    //O populate irá filtrar o campo 'categoria', semelhante a um join, para capturar o nome
+    //Irá trazer a descrição da categoria através do id da categoria na pagina de postagens
+    Postagem.find().populate("categoria").sort({data: "desc"}).lean().then((postagens) => {
+        res.render("admin/postagens", {postagens: postagens})
+    }).catch((err) => {
+        req.flash("error_msg", "Houve um erro ao listar as postagens")
+        res.redirect("/admin")
+    })
+    
+})
+
+// Rota para adição de postagens
+router.get("/postagens/add", (req,res) => {
+    //Irá popular o campo de categorias com todas as categorias criadas no banco
+    Categoria.find().lean().then((categorias) => {
+        res.render("admin/addpostagem", {categorias: categorias})
+    }).catch((err) => {
+        req.flash("error_msg", "Houve um erro ao carregar o formulário.")
+        res.redirect("/admin")
+    })
+    
+})
+
+
+// Rota para salvar postagens no banco de dados
+router.post("/postagens/nova", (req, res) => {
+    var erros = []
+
+    if(req.body.categoria == "0"){
+        erros.push({texto: "Categoria inválida, registre uma categoria."})
+    }
+
+    if(erros.length > 0){
+        res.render("admin/addpostagem", {erros: erros})
+    } else {
+        const novaPostagem = {
+            titulo: req.body.titulo,
+            descricao: req.body.descricao,
+            conteudo: req.body.conteudo,
+            categoria: req.body.categoria,
+            slug: req.body.slug
+        }
+
+        new Postagem(novaPostagem).save().then(() => {
+            req.flash("success_msg", "Postagem criada com sucesso.")
+            res.redirect("/admin/postagens")
+        }).catch((err) => {
+            req.flash("error_msg", "Houve um erro durante o salvamento da postagem.")
+            res.redirect("/admin/postagens")
+        })
+    }
+})
+
+
+// Rota para página de editar postagem
+router.get("/postagens/edit/:id", (req, res) => {
+
+    Postagem.findOne({_id: req.params.id}).lean().then((postagem) => {
+        Categoria.find().lean().then((categorias) => {
+            res.render("admin/editpostagem", {categorias: categorias, postagem: postagem})
+
+        }).catch((err) => {
+            req.flash("error_msg", "Houve um erro ao listar as categorias")
+            res.redirect("/admin/postagens")
+        })
+    }).catch((err) => {
+        req.flash("error_msg", "Houve o erro ao carregar o formulário de edição.")
+        res.redirect("/admin/postagens")
+    })
+    
+})
+
+
+// Rota para atualizar postagem
+
+router.post("/postagem/edit", (req, res) => {
+    Postagem.findOne({_id: req.body.id}).then((postagem) => {
+        postagem.titulo = req.body.titulo
+        postagem.slug = req.body.slug
+        postagem.descricao = req.body.descricao
+        postagem.conteudo = req.body.conteudo
+        postagem.categoria = req.body.categoria
+        
+        postagem.save().then(() => {
+            req.flash("success_msg", "Postagem editada com sucesso")
+            res.redirect("/admin/postagens")
+        }).catch((err) => {
+            req.flash("error_msg", "Erro interno")
+            res.redirect("/admin/postagens")
+        })
+    }).catch((err) => {
+        req.flash("error_msg", "Houve um erro ao salvar a edição.")
+        res.redirect("/admin/postagens")
+    })
+})
+
+//Rota para excluir a postagem no backend
+router.post("/postagens/deletar", (req, res) => {
+    Postagem.deleteOne({_id: req.body.id}).then(() => {
+        req.flash("success_msg", "Postagem deletada com sucesso")
+        res.redirect("/admin/postagens")
+
+    }).catch((err) => {
+        req.flash("error_msg", "Houve um erro ao deletar a postagem")
+        res.redirect("/admin/postagens")
+
+    })
+})
 //É necessário exportar o router para podermos acessar as rotas em outras partes do projeto
 module.exports = router

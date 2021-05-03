@@ -1,0 +1,14 @@
+{{!-- Página que será gerada com todas as postagens da categoria selecionada --}}
+{{#each postagens}}
+<div class="card mt-4">
+    <div class="card-body">
+        <h3>{{titulo}}</h3>
+        <p>{{descricao}}</p>
+        <a href="/postagem/{{slug}}"><button class="btn btn-secondary">Leia mais</button></a>
+        <hr>
+        <small>{{#formatDate data}}{{/formatDate}}</small>
+    </div>
+</div>
+{{else}}
+<h4 class="form-control mt-4">Nenhuma postagem encontrada.</h4>
+{{/each}}

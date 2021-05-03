@@ -1,0 +1,20 @@
+{{!-- Página de formulário de registro --}}
+{{#each erros}}
+    <div class="alert alert-danger">{{texto}}</div>
+{{/each}}
+<h2>Crie sua conta</h2>
+<div class="card">
+    <div class="card-body">
+        <form action="" method="POST">
+            <label for="nome">Nome:</label>
+                <input type="text" name="nome" class="form-control" required>
+            <label for="email">Email:</label>
+                <input type="email" name="email" class="form-control" required>
+            <label for="senha">Senha:</label>
+                <input type="password" name="senha" class="form-control" required>
+            <label for="senha2">Repita sua senha:</label>
+                <input type="password" name="senha2" class="form-control">
+            <button type="submit" class="btn btn-success mt-4 col-md-12">Criar conta</button>
+        </form>
+    </div>
+</div>

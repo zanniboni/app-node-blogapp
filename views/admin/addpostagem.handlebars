@@ -1,0 +1,34 @@
+{{!-- Página para adicionar postagens no nosso blog --}}
+{{#each erros}}
+    <div class="alert alert-danger">{{texto}}</div>
+{{else}}
+
+{{/each}}
+
+<h3>Criar postagem</h3>
+<div class="card">
+    <div class="card-body">
+        <form action="/admin/postagens/nova" method="POST">
+            <label for="titulo">Titulo: </label>
+                <input type="text" name="titulo" class="form-control" required>
+            <label for="slug">Slug: </label>
+                <input type="text" name="slug" class="form-control" required>
+            <label for="descricao">Descrição: </label>
+                <input type="text" name="descricao" class="form-control" required>
+            <label for="conteudo">Conteúdo: </label>
+                <textarea type="tet" name="conteudo" class="form-control" required></textarea>
+
+            <label for="categoria">Categoria: </label>
+                <select name="categoria" id="categoria" class="form-select form-select mb-3" aria-label="">
+                    {{#each categorias}}
+                        <option value="{{_id}}">{{nome}}</option>
+                    {{else}}
+                        <option value="0">Nenhuma categoria cadastrada.</option>
+                    {{/each}}
+                </select>
+            <button type="submit" class="btn btn-success mt-4 col-md-12">
+                Criar postagem
+            </button>
+        </form>
+    </div>
+</div>
