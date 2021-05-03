@@ -1,0 +1,22 @@
+{{!-- Definido página de categorias com a rota para adicionar uma nova categoria --}}
+{{!-- Existe a possibilidade de editar a categoria ou deletar a categoria --}}
+<h2>Lista de categorias: </h2>
+<hr>
+<a href="/admin/categorias/add"><button class="btn btn-success">Nova categoria</button></a>
+
+{{#each categorias}}
+    <div class="card mt-4">
+        <div class="card-body">
+            <h4>{{nome}}</h4>
+            <small>Slug: {{slug}}</small> <br>
+            <small>Data de criação: {{#formatDate date}}{{/formatDate}}</small> <br>
+            <a href="/admin/categorias/edit/{{_id}}"><button class="btn btn-dark mt-4">Editar categoria</button></a>
+            <form action="/admin/categorias/deletar" method="POST">
+                <input type="hidden" name="id" value="{{_id}}">
+                <button type="submit" class="btn btn-danger mt-2">Deletar categoria</button>
+            </form>
+        </div>
+    </div>
+{{else}}
+<h4 class="form-control mt-4">Nenhuma categoria encontrada.</h4>
+{{/each}}

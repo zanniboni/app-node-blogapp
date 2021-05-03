@@ -1,3 +1,4 @@
+{{!-- Main do handlebars define a estrutura padrão de toda a estrutura do app --}}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,8 +9,18 @@
     <title>Blog NodeJS</title>
 </head>
 <body>
+    {{!-- Definido por padrão a navbar, sempre irá aparecer no topo --}}
     {{>_navbar}}
-    {{{body}}}
+
+
+
+    {{!-- O body sempre estará centralizado em um container --}}
+    <div class="container mt-4">
+        {{!-- Definido por padrão o local que irá aparecer 
+        as mensagens na tela --}}
+        {{>_msg}}
+        {{{body}}}    
+    </div>    
 </body>
 
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js" integrity="sha384-SR1sx49pcuLnqZUnnPwx6FCym0wLsk5JZuNx2bPPENzswTNFaQU1RDvt3wT4gWFG" crossorigin="anonymous"></script>
