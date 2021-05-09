@@ -1,18 +1,21 @@
 //Carregando módulos
-    const express = require('express') 
-    const handlebars = require('express-handlebars')
-    const app = express()
-    const admin = require('./routes/admin')
-    const path = require('path')
-    const mongoose = require('mongoose')
+    const express = require('express') //Base do app
+    const handlebars = require('express-handlebars') //Utilizar handlebars + express
+    const app = express() // Definição do nosso app
+    const admin = require('./routes/admin') //Rotas de administrador
+    const path = require('path') 
+    const mongoose = require('mongoose') //Banco de dados
     const session = require('express-session') //Usado para definir sessões do navegador
-    const flash = require('connect-flash')
-    const moment = require('moment')
-    require("./models/Postagem")
+    const flash = require('connect-flash') //Mensagens de popup de erro e sucesso
+    const moment = require('moment') //Gerenciar horas nas publicações
+    require("./models/Postagem") //Model para postagem
     const Postagem = mongoose.model("postagens")
-    require("./models/Categoria")
+    require("./models/Categoria") // Model para categorias
     const Categoria = mongoose.model("categorias")
-    const usuarios = require('./routes/usuario')
+    const usuarios = require('./routes/usuario') //Model de usuários
+    const passport = require("passport") //Autenticação 
+    require("./config/auth")(passport) //Passar a definição do passport para o arquivo auth
+    const db = require("./config/db") //Arquivo de gerenciamento do banco de dados
 
 //Configurações
     // Configurar sessão
@@ -21,13 +24,21 @@
             resave: true,
             saveUninitialized: true
         }))
+        
+    //Inicialização do passport e da session do passport
+        app.use(passport.initialize())
+        app.use(passport.session())
     
+    //Definicação do flash para as mensagens
         app.use(flash())
     
     // Middleware
+        //Definição de variáveis globais no app
         app.use((req, res, next) => {
             res.locals.success_msg = req.flash("success_msg")
-            res.locals.erros_msg = req.flash("error_msg")
+            res.locals.error_msg = req.flash("error_msg")
+            res.locals.error = req.flash("error")
+            res.locals.user = req.user || null
             next()
         })
 
@@ -45,11 +56,7 @@
         app.set('view engine', 'handlebars')
     //Mongoose
         mongoose.Promise = global.Promise
-        mongoose.connect("mongodb://localhost/blogapp", {
-            useNewUrlParser: true,
-            useUnifiedTopology: true,
-            useCreateIndex: true
-        }).then(() => {
+        mongoose.connect(db.mongoURI).then(() => {
             console.log("Conectado ao mongo")
         }).catch((err) => {
             console.log("Erro ao se conectar: " + err)
@@ -140,7 +147,7 @@
     app.use('/usuarios', usuarios)
 
 //Outros
-const PORT = 8081
+const PORT = process.env.PORT || 8081
 app.listen(PORT, () => {
     console.log("Servidor rodando!")
 })

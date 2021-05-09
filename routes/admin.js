@@ -2,6 +2,9 @@
 const express = require("express")
 const router = express.Router()
 
+//Intancia do middlerware 'eAdmin' para utilizarmos na definição das rotas para checar se o usuário é ou não administrador
+const {eAdmin} = require("../helpers/eAdmin")  
+
 //Importado mongoose
 const mongoose = require('mongoose')
 
@@ -14,17 +17,17 @@ const Postagem = mongoose.model("postagens")
 
 
 // Rota da página inicial do painel admin
-router.get('/', (req, res) => {
+router.get('/', eAdmin, (req, res) => {
     res.render("admin/index")
 })
 
 // Rota da pagína de posts
-router.get('/posts', (req, res) => {
+router.get('/posts', eAdmin, (req, res) => {
     res.send("Página de posts")
 })
 
 // Rota das categorias de admin
-router.get('/categorias', (req, res) => {
+router.get('/categorias', eAdmin, (req, res) => {
     Categoria.find().lean().sort({date: "desc"}).then((categorias) => {
         res.render("admin/categorias", {categorias: categorias})
     }).catch((erro) => {
@@ -35,7 +38,7 @@ router.get('/categorias', (req, res) => {
 })
 
 // Rota para adição de categorias através do painel admin (Formulario)
-router.get('/categorias/add', (req, res) => {
+router.get('/categorias/add', eAdmin,  (req, res) => {
     res.render("admin/addcategoria")
 })
 
@@ -54,7 +57,7 @@ router.get("/categorias/edit/:id", (req, res) => {
 })
 
 // Enviar requisição de edição de categoria para o backend
-router.post("/categorias/edit", (req, res) => {
+router.post("/categorias/edit", eAdmin,  (req, res) => {
 
     //Procura a categoria e depois faz a edição no mongo
     Categoria.findOne({_id: req.body.id}).then((categoria) => {
@@ -79,7 +82,7 @@ router.post("/categorias/edit", (req, res) => {
 })
 
 // Rota tipo POST para enviar as informações para o banco de dados
-router.post("/categorias/nova", (req, res) => {
+router.post("/categorias/nova", eAdmin, (req, res) => {
 
     //Array de erros para verificação do formulário
     var erros = []
@@ -121,7 +124,7 @@ router.post("/categorias/nova", (req, res) => {
 })
 
 //Rota para excluir a categoria no backend
-router.post("/categorias/deletar", (req, res) => {
+router.post("/categorias/deletar", eAdmin, (req, res) => {
     Categoria.deleteOne({_id: req.body.id}).then(() => {
         req.flash("success_msg", "Categoria deletada com sucesso")
         res.redirect("/admin/categorias")
@@ -135,7 +138,7 @@ router.post("/categorias/deletar", (req, res) => {
 
 
 // Rota para postagens
-router.get("/postagens", (req, res) => {
+router.get("/postagens", eAdmin, (req, res) => {
     //O populate irá filtrar o campo 'categoria', semelhante a um join, para capturar o nome
     //Irá trazer a descrição da categoria através do id da categoria na pagina de postagens
     Postagem.find().populate("categoria").sort({data: "desc"}).lean().then((postagens) => {
@@ -148,7 +151,7 @@ router.get("/postagens", (req, res) => {
 })
 
 // Rota para adição de postagens
-router.get("/postagens/add", (req,res) => {
+router.get("/postagens/add", eAdmin, (req,res) => {
     //Irá popular o campo de categorias com todas as categorias criadas no banco
     Categoria.find().lean().then((categorias) => {
         res.render("admin/addpostagem", {categorias: categorias})
@@ -161,7 +164,7 @@ router.get("/postagens/add", (req,res) => {
 
 
 // Rota para salvar postagens no banco de dados
-router.post("/postagens/nova", (req, res) => {
+router.post("/postagens/nova", eAdmin, (req, res) => {
     var erros = []
 
     if(req.body.categoria == "0"){
@@ -191,7 +194,7 @@ router.post("/postagens/nova", (req, res) => {
 
 
 // Rota para página de editar postagem
-router.get("/postagens/edit/:id", (req, res) => {
+router.get("/postagens/edit/:id", eAdmin,  (req, res) => {
 
     Postagem.findOne({_id: req.params.id}).lean().then((postagem) => {
         Categoria.find().lean().then((categorias) => {
@@ -211,7 +214,7 @@ router.get("/postagens/edit/:id", (req, res) => {
 
 // Rota para atualizar postagem
 
-router.post("/postagem/edit", (req, res) => {
+router.post("/postagem/edit", eAdmin, (req, res) => {
     Postagem.findOne({_id: req.body.id}).then((postagem) => {
         postagem.titulo = req.body.titulo
         postagem.slug = req.body.slug
@@ -233,7 +236,7 @@ router.post("/postagem/edit", (req, res) => {
 })
 
 //Rota para excluir a postagem no backend
-router.post("/postagens/deletar", (req, res) => {
+router.post("/postagens/deletar", eAdmin, (req, res) => {
     Postagem.deleteOne({_id: req.body.id}).then(() => {
         req.flash("success_msg", "Postagem deletada com sucesso")
         res.redirect("/admin/postagens")

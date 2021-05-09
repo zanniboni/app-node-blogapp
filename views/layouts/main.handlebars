@@ -18,6 +18,9 @@
     <div class="container mt-4">
         {{!-- Definido por padrão o local que irá aparecer 
         as mensagens na tela --}}
+        {{#if error}}
+            <div class="alert alert-danger">{{error}}</div>
+        {{/if}}
         {{>_msg}}
         {{{body}}}    
     </div>    

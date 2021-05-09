@@ -4,7 +4,8 @@
     const mongoose = require('mongoose')
     require("../models/Usuario")
     const Usuario = mongoose.model("usuarios")
-
+    const bcrypt = require('bcryptjs') //Encriptar senha
+    const passport = require('passport') //Autenticar usuário
 
 //Rota para página de registro
 router.get("/registro", (req, res) => {
@@ -12,7 +13,7 @@ router.get("/registro", (req, res) => {
 })
 
 
-//Validação do formulário de login
+//Validação do formulário de registro
 router.post("/registro", (req, res) => {
     var erros = []
 
@@ -39,8 +40,71 @@ router.post("/registro", (req, res) => {
     if(erros.length > 0){
         res.render("usuarios/registro", {erros: erros})
     } else {
+        Usuario.findOne({email: req.body.email}).then((usuario) => {
+            if(usuario){
+                req.flash("error_msg", "E-mail já cadastrado.")
+                res.redirect("/usuarios/registro")
+            } else {
+                
+                const novoUsuario = new Usuario({
+                    nome: req.body.nome,
+                    email: req.body.email,
+                    senha: req.body.senha
+                })
 
+                bcrypt.genSalt(10, (erro, salt) => {
+                    bcrypt.hash(novoUsuario.senha, salt, (erro, hash) => {
+                        if(erro){
+                            req.flash("error_msg", "Houve um erro ao salvar um usuário.")
+                            res.redirect("/")
+                        }
+
+                        novoUsuario.senha = hash
+                        novoUsuario.save().then(() =>{
+                            req.flash("success_msg", "Usuário criado com sucesso.")
+                            res.redirect("/")
+                        }).catch((err) => {
+                            req.flash("error_msg", "Houve um erro ao criar o usuário.")
+                            res.redirect("/usuarios/registro")
+                        })
+                    })
+                })
+
+                
+
+            }
+        }).catch((err) => {
+            req.flash("error_msg", "Houve um erro interno")
+            res.redirect("/")
+        })
     }
 
 })
+
+
+//Rota para a tela de login 
+
+router.get("/login", (req, res) => {
+    res.render("usuarios/login")
+})
+
+//Rota de login para autenticar o usuário
+router.post("/login", (req, res, next) => {
+    //Função de autenticação do passport, recebe a instrução local pois é o tipo de autenticação utilizada
+    passport.authenticate("local", {
+        successRedirect: "/",
+        failureRedirect: "/usuarios/login",
+        failureFlash: true
+    })(req, res, next)
+
+
+})
+
+//Efetua o logout do usuário
+router.get("/logout", (req, res) => {
+    req.logout()
+    req.flash("success_msg", "Sessão finalizada.")
+    res.redirect("/")
+})
+
 module.exports = router
