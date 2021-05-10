@@ -4,7 +4,7 @@
     const mongoose = require('mongoose')
     require("../models/Usuario")
     const Usuario = mongoose.model("usuarios")
-    const bcrypt = require('bcryptjs') //Encriptar senha
+    const bcrypt = require("bcrypt") //Encriptar senha
     const passport = require('passport') //Autenticar usuário
 
 //Rota para página de registro
