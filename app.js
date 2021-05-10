@@ -55,7 +55,7 @@
                 }}))
         app.set('view engine', 'handlebars')
     //Mongoose
-        mongoose.Promise = global.Promise
+        //mongoose.Promise = global.Promise
         mongoose.connect(db.mongoURI, db.serverConfig).then(() => {
             console.log("Conectado ao mongo")
         }).catch((err) => {
