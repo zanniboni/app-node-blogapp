@@ -80,6 +80,7 @@
 
         }).catch((err) => {
             req.flash("error_msg", "Houve um erro ao exibir as postagens.")
+            console.log(err)
             res.redirect("/404")
         })
         
