@@ -1,7 +1,7 @@
 //Bibliotecas
     const localStrategy = require("passport-local").Strategy //Autenticação local
     const mongoose = require("mongoose") //Database
-    const bcrypt = require("bcryptjs") //Encriptador de senha
+    const bcrypt = require("bcrypt") //Encriptador de senha
 
 //Model de usuário
 require("../models/Usuario")
