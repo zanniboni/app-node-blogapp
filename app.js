@@ -59,7 +59,9 @@
         mongoose.connect(db.mongoURI, db.serverConfig).then(() => {
             console.log("Conectado ao mongo")
         }).catch((err) => {
-            console.log("Erro ao se conectar: " + err + db.mongoURI + db.serverConfig)
+            console.log("Erro ao se conectar: " + err)
+            console.log(db.mongoURI)
+            console.log(db.serverConfig)
         })
     
     //Public
