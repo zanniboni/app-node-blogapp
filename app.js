@@ -39,6 +39,7 @@
             res.locals.error_msg = req.flash("error_msg")
             res.locals.error = req.flash("error")
             res.locals.user = req.user || null
+            res.locals.production = true
             next()
         })
 
@@ -60,8 +61,6 @@
             console.log("Conectado ao mongo")
         }).catch((err) => {
             console.log("Erro ao se conectar: " + err)
-            console.log(db.mongoURI)
-            console.log(db.serverConfig)
         })
     
     //Public
