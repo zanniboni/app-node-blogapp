@@ -16,7 +16,8 @@
     const passport = require("passport") //Autenticação 
     require("./config/auth")(passport) //Passar a definição do passport para o arquivo auth
     const db = require("./config/db") //Arquivo de gerenciamento do banco de dados
-
+    const bcrypt = require("bcryptjs")
+    
 //Configurações
     // Configurar sessão
         app.use(session({
@@ -147,7 +148,7 @@
     app.use('/usuarios', usuarios)
 
 //Outros
-const PORT = process.env.PORT || 8081
+var PORT = process.env.PORT || 3000
 app.listen(PORT, () => {
     console.log("Servidor rodando!")
 })
