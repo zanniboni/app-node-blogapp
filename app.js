@@ -81,7 +81,7 @@
         }).catch((err) => {
             req.flash("error_msg", "Houve um erro ao exibir as postagens.")
             console.log(err)
-            res.redirect("/404")
+            res.render("pages/error")
         })
         
     })
@@ -90,6 +90,11 @@
         res.send("Erro 404!")
     })
     
+    //Rota para homepage parallax
+    app.get("/home", (req, res) => {
+        res.render("pages/home")
+    })
+
     //Rota para visualizar as postagens na página personalizada de cada um
     app.get("/postagem/:slug", (req, res) => {
         Postagem.findOne({slug: req.params.slug}).lean().then((postagem) => {
@@ -146,6 +151,10 @@
 
     //Utilizar arquivo de rotas para usuario
     app.use('/usuarios', usuarios)
+
+    app.use((req, res, next) => {
+        res.render("pages/error")
+    });
 
 //Outros
 var PORT = process.env.PORT || 3000
