@@ -4,9 +4,9 @@ if (production) {
     module.exports = {
         mongoURI: "mongodb+srv://zanniboni:StrongerUlisses002@blogapp.r9puk.mongodb.net/blogapp?retryWrites=true&w=majority",
         serverConfig: {
-            // useNewUrlParser: true,
-            // useUnifiedTopology: true, 
-            // useCreateIndex: true
+            useNewUrlParser: true,
+            useUnifiedTopology: true, 
+            useCreateIndex: true
         }
     }
 } else {
