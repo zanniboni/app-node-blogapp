@@ -20,7 +20,7 @@ const Usuario = new Schema({
     },
     isAdmin: {
         type: Number,
-        default: 1
+        default: 0
     }
 })
 

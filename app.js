@@ -16,6 +16,7 @@
     const passport = require("passport") //Autenticação 
     require("./config/auth")(passport) //Passar a definição do passport para o arquivo auth
     const db = require("./config/db") //Arquivo de gerenciamento do banco de dados
+const { brotliCompressSync } = require('zlib')
 
 //Configurações
     // Configurar sessão
@@ -39,8 +40,25 @@
             res.locals.error_msg = req.flash("error_msg")
             res.locals.error = req.flash("error")
             res.locals.user = req.user || null
+            if(req.user){
+                res.locals.usuarioAdmin = req.user.isAdmin
+            }
+            res.locals.mensagem = "N/A"
+            
             next()
         })
+
+    //Configurando toast de notificações]
+    var option = 
+    {
+        animation: true,
+        delay: 2000
+    }
+    function toasty(){
+        var toastHTMLElement = document.getElementById("liveToast");
+        var toastElement = new bootstrap.Toast(toastHTMLElement, option);
+        toastElement.show();
+    }
 
     // Configurar BodyParser d o express
         app.use(express.urlencoded({extended: true}))
@@ -76,7 +94,7 @@
     //Rota para a página inicial, responsável por listar todas as postagens
     app.get("/", (req, res) => {
         Postagem.find().populate("categoria").sort({data: "desc"}).lean().then((postagens) => {
-            res.render("index", {postagens: postagens})
+            res.render("pages/home", {postagens: postagens})
 
         }).catch((err) => {
             req.flash("error_msg", "Houve um erro ao exibir as postagens.")
