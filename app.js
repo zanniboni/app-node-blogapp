@@ -2,21 +2,35 @@
     const express = require('express') //Base do app
     const handlebars = require('express-handlebars') //Utilizar handlebars + express
     const app = express() // Definição do nosso app
-    const admin = require('./routes/admin') //Rotas de administrador
     const path = require('path') 
     const mongoose = require('mongoose') //Banco de dados
     const session = require('express-session') //Usado para definir sessões do navegador
     const flash = require('connect-flash') //Mensagens de popup de erro e sucesso
     const moment = require('moment') //Gerenciar horas nas publicações
-    require("./models/Postagem") //Model para postagem
-    const Postagem = mongoose.model("postagens")
-    require("./models/Categoria") // Model para categorias
-    const Categoria = mongoose.model("categorias")
-    const usuarios = require('./routes/usuario') //Model de usuários
     const passport = require("passport") //Autenticação 
     require("./config/auth")(passport) //Passar a definição do passport para o arquivo auth
     const db = require("./config/db") //Arquivo de gerenciamento do banco de dados
-const { brotliCompressSync } = require('zlib')
+
+    //** Importando rotas */
+    const admin = require('./routes/admin') //Rotas de administrador
+    const usuarios = require('./routes/usuario') //Model de usuários
+
+    //** Importando models e configurando models */
+    require("./models/Postagem") 
+    const Postagem = mongoose.model("postagens")
+    require("./models/Categoria") 
+    const Categoria = mongoose.model("categorias")
+
+    //** Importando configurações do jQuery */
+    var jsdom = require('jsdom');
+    const { JSDOM } = jsdom;
+    const { window } = new JSDOM();
+    const { document } = (new JSDOM('')).window;
+    global.document = document;
+    
+    var $ = jQuery = require('jquery')(window);
+    //** Fim das configurações do jQuery */
+
 
 //Configurações
     // Configurar sessão
@@ -94,7 +108,7 @@ const { brotliCompressSync } = require('zlib')
     //Rota para a página inicial, responsável por listar todas as postagens
     app.get("/", (req, res) => {
         Postagem.find().populate("categoria").sort({data: "desc"}).lean().then((postagens) => {
-            res.render("pages/home", {postagens: postagens})
+            res.render("index", {postagens: postagens})
 
         }).catch((err) => {
             req.flash("error_msg", "Houve um erro ao exibir as postagens.")

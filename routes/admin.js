@@ -13,12 +13,38 @@ require("../models/Categoria")
 const Categoria = mongoose.model("categorias")
 require("../models/Postagem")
 const Postagem = mongoose.model("postagens")
+require("../models/Usuario")
+const Usuario = mongoose.model("usuarios")
 // --- Fim da importação de models
 
 
 // Rota da página inicial do painel admin
-router.get('/', eAdmin, (req, res) => {
+router.get("/", eAdmin, (req, res) => {
     res.render("admin/index")
+})
+
+//Rota para página de usuários
+router.get('/usuarios', eAdmin, (req, res) => {
+    Usuario.find().lean().then((usuarios) => {
+        res.render("admin/usuarios", {usuarios: usuarios})
+    }).catch((err) => {
+        req.flash("error_msg", "Houve um erro ao listar as categorias")
+        res.redirect("/")
+    })
+
+})
+
+router.get("/usuarios/edit/:id", (req, res) => {
+    //Findone é semelhante ao select, recebendo parametros de 'WHERE'
+    Usuario.findOne({
+        _id: req.params.id
+    }).lean().then((usuarios) => {
+        res.render("admin/editusuario", {usuarios: usuarios})
+    }).catch((err) => {
+        req.flash("error_msg", "Erro ao encontrar usuário")
+        res.redirect("/admin/usuarios")
+    })
+
 })
 
 // Rota da pagína de posts
@@ -247,5 +273,6 @@ router.post("/postagens/deletar", eAdmin, (req, res) => {
 
     })
 })
+
 //É necessário exportar o router para podermos acessar as rotas em outras partes do projeto
 module.exports = router

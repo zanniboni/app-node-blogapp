@@ -1,0 +1,25 @@
+
+<div class="card">
+    <h3 class="mt-2 ms-lg-2;">Lista de usuários</h3>
+    <div class="card-body">
+        <div class="col-md-auto container-fluid d-flex flex-wrap">
+            {{#each usuarios}}
+            <div class="card mt-4 ms-2" style="width: 18rem;">
+                <div class="card-body">
+                    <h5 class="card-title">{{nome}}</h5>
+                    <p class="card-text">EMAIL: {{email}} <br> ID: {{_id}}</p>
+
+                    <div class="mt-4">
+                        <a href="/admin/usuarios/edit/{{_id}}"><button class="btn btn-dark mt-2">Editar</button></a>
+                        <form action="/admin/usuarios/deletar" method="POST">
+                            <input type="hidden" name="id" value="{{_id}}">
+                            <button type="submit" class="btn btn-danger mt-2">Excluir</button>
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+            {{/each}}
+        </div>
+    </div>
+</div>
