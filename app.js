@@ -48,17 +48,17 @@ const { brotliCompressSync } = require('zlib')
             next()
         })
 
-    //Configurando toast de notificações]
-    var option = 
-    {
-        animation: true,
-        delay: 2000
-    }
-    function toasty(){
-        var toastHTMLElement = document.getElementById("liveToast");
-        var toastElement = new bootstrap.Toast(toastHTMLElement, option);
-        toastElement.show();
-    }
+    ////**  Configurando toast de notificações */////
+    // var option = 
+    // {
+    //     animation: true,
+    //     delay: 2000
+    // }
+    // function toasty(){
+    //     var toastHTMLElement = document.getElementById("liveToast");
+    //     var toastElement = new bootstrap.Toast(toastHTMLElement, option);
+    //     toastElement.show();
+    // }
 
     // Configurar BodyParser d o express
         app.use(express.urlencoded({extended: true}))
