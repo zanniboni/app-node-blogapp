@@ -56,6 +56,7 @@
             res.locals.user = req.user || null
             if(req.user){
                 res.locals.usuarioAdmin = req.user.isAdmin
+                res.locals.nomeUsuario = req.user.nome
             }
             res.locals.mensagem = "N/A"
             
