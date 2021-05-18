@@ -7,6 +7,20 @@
     const bcrypt = require("bcrypt") //Encriptar senha
     const passport = require('passport') //Autenticar usuário
 
+    // Configuração de upload de arquivos
+    const multer = require("multer")
+    const path = require("path")
+
+    const storage = multer.diskStorage({
+        destination: function(req, file, cb){
+            cb(null, "public/img/post-img/")
+        },
+        filename: function(req, file, cb){
+            cb(null, file.originalname + Date.now() + path.extname(file.originalname))
+        }
+    })
+    const upload = multer({storage})
+
 //Rota para página de registro
 router.get("/registro", (req, res) => {
     res.render("usuarios/registro")
@@ -14,7 +28,7 @@ router.get("/registro", (req, res) => {
 
 
 //Validação do formulário de registro
-router.post("/registro", (req, res) => {
+router.post("/registro", upload.single("file"), (req, res) => {
     var erros = []
 
     if(!req.body.nome || typeof req.body.nome == undefined || req.body.nome == null){
@@ -49,7 +63,8 @@ router.post("/registro", (req, res) => {
                 const novoUsuario = new Usuario({
                     nome: req.body.nome,
                     email: req.body.email,
-                    senha: req.body.senha
+                    senha: req.body.senha,
+                    urlFoto: req.file.filename
                 })
 
                 bcrypt.genSalt(10, (erro, salt) => {

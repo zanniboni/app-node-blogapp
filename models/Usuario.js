@@ -21,6 +21,10 @@ const Usuario = new Schema({
     isAdmin: {
         type: Number,
         default: 0
+    },
+    urlFoto: {
+        type: String,
+        require: false
     }
 })
 

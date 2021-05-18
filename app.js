@@ -11,6 +11,8 @@
     require("./config/auth")(passport) //Passar a definição do passport para o arquivo auth
     const db = require("./config/db") //Arquivo de gerenciamento do banco de dados
 
+
+
     //** Importando rotas */
     const admin = require('./routes/admin') //Rotas de administrador
     const usuarios = require('./routes/usuario') //Model de usuários
@@ -33,6 +35,13 @@
 
 
 //Configurações
+    // Enable CORS
+    app.use(function(req, res, next) {
+        res.header('Access-Control-Allow-Origin', '*');
+        res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+        next();
+    });
+
     // Configurar sessão
         app.use(session({
             secret: "blogapp",
@@ -63,6 +72,7 @@
             next()
         })
 
+        
     ////**  Configurando toast de notificações */////
     // var option = 
     // {

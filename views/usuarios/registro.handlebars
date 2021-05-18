@@ -5,7 +5,7 @@
 <h2>Crie sua conta</h2>
 <div class="card">
     <div class="card-body">
-        <form action="" method="POST">
+        <form action="" method="POST" enctype="multipart/form-data">
             <label for="nome">Nome:</label>
                 <input type="text" name="nome" class="form-control" required>
             <label for="email">Email:</label>
@@ -14,6 +14,12 @@
                 <input type="password" name="senha" class="form-control" required>
             <label for="senha2">Repita sua senha:</label>
                 <input type="password" name="senha2" class="form-control">
+
+            <label class="form-label" for="file">Selecionar foto</label>
+            <input type="file" class="form-control" id="file" name="file" />
+
+            
+
             <button type="submit" class="btn btn-success mt-4 col-md-12">Criar conta</button>
         </form>
     </div>
