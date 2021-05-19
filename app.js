@@ -22,6 +22,8 @@
     const Postagem = mongoose.model("postagens")
     require("./models/Categoria") 
     const Categoria = mongoose.model("categorias")
+    require("./models/Produtos")
+    const Produto = mongoose.model("produtos")
 
     //** Importando configurações do jQuery */
     var jsdom = require('jsdom');
@@ -117,9 +119,21 @@
 //Rotas
 
     //Rota para a página inicial, responsável por listar todas as postagens
+    // app.get("/", (req, res) => {
+    //     Postagem.find().populate("categoria").sort({data: "desc"}).lean().then((postagens) => {
+    //         res.render("index", {postagens: postagens})
+
+    //     }).catch((err) => {
+    //         req.flash("error_msg", "Houve um erro ao exibir as postagens.")
+    //         console.log(err)
+    //         res.render("pages/error")
+    //     })
+        
+    // })
+
     app.get("/", (req, res) => {
-        Postagem.find().populate("categoria").sort({data: "desc"}).lean().then((postagens) => {
-            res.render("index", {postagens: postagens})
+        Produto.find().populate("categoria").sort({data: "desc"}).lean().then((produto) => {
+            res.render("index", {produto: produto})
 
         }).catch((err) => {
             req.flash("error_msg", "Houve um erro ao exibir as postagens.")
@@ -153,6 +167,21 @@
         })
     })
 
+    //Rota para visualizar as postagens na página personalizada de cada um
+    app.get("/produtos/:slug", (req, res) => {
+        Produto.findOne({slug: req.params.slug}).lean().then((produto) => {
+            if(produto){
+                res.render("produtos/index", {produto: produto})
+            }else{
+                req.flash("error_msg", "Esse produto não existe")
+                res.redirect("/")
+            }
+        }).catch((err) => {
+            req.flash("error_msg", "Houve um erro interno")
+            res.redirect("/")
+        })
+    })
+    
     //Rota para página de categorias
     app.get("/categorias", (req, res) => {
         Categoria.find().lean().then((categorias) => {
