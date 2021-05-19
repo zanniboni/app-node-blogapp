@@ -1,0 +1,44 @@
+{{!-- Página para adicionar postagens no nosso blog --}}
+{{#each erros}}
+    <div class="alert alert-danger">{{texto}}</div>
+{{else}}
+
+{{/each}}
+
+<h3>Criar produto</h3>
+<div class="card">
+    <div class="card-body">
+        <form action="/admin/produtos/nova" method="POST" enctype="multipart/form-data">
+            <label for="nome">Nome: </label>
+                <input type="text" name="nome" class="form-control" required>
+
+            <label for="categoria">Categoria: </label>
+                <select name="categoria" id="categoria" class="form-select form-select mb-3" aria-label="">
+                    {{#each categoria}}
+                        <option value="{{_id}}">{{nome}}</option>
+                    {{else}}
+                        <option value="0">Nenhuma categoria cadastrada.</option>
+                    {{/each}}
+                </select>
+
+            <label for="descricao">Descrição: </label>
+                <input type="text" name="descricao" class="form-control" required>
+
+            <label for="quantidade">Quantidade: </label>
+                <input type="text" name="quantidade" class="form-control" required>
+
+            <label for="preco">Preço: </label>
+                <input type="text" name="preco" class="form-control" required>
+
+            <label class="form-label" for="file">Selecionar foto</label>
+            <input type="file" class="form-control" id="file" name="file" />
+
+            <label for="slug">Slug: </label>
+                <input type="text" name="slug" class="form-control" required>
+
+            <button type="submit" class="btn btn-success mt-4 col-md-12">
+                Criar produto
+            </button>
+        </form>
+    </div>
+</div>

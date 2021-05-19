@@ -15,8 +15,23 @@ require("../models/Postagem")
 const Postagem = mongoose.model("postagens")
 require("../models/Usuario")
 const Usuario = mongoose.model("usuarios")
+require("../models/Produtos")
+const Produtos = mongoose.model("produtos")
 // --- Fim da importação de models
 
+// Configuração de upload de arquivos
+const multer = require("multer")
+const path = require("path")
+
+const storage = multer.diskStorage({
+    destination: function(req, file, cb){
+        cb(null, "public/img/img-produto/")
+    },
+    filename: function(req, file, cb){
+        cb(null, file.originalname + Date.now() + path.extname(file.originalname))
+    }
+})
+const upload = multer({storage})
 
 // Rota da página inicial do painel admin
 router.get("/", eAdmin, (req, res) => {
@@ -34,7 +49,7 @@ router.get('/usuarios', eAdmin, (req, res) => {
 
 })
 
-router.get("/usuarios/edit/:id", (req, res) => {
+router.get("/usuarios/edit/:id", eAdmin, (req, res) => {
     //Findone é semelhante ao select, recebendo parametros de 'WHERE'
     Usuario.findOne({
         _id: req.params.id
@@ -47,9 +62,134 @@ router.get("/usuarios/edit/:id", (req, res) => {
 
 })
 
-// Rota da pagína de posts
-router.get('/posts', eAdmin, (req, res) => {
-    res.send("Página de posts")
+// Rota das categorias de admin
+router.get('/produtos', eAdmin, (req, res) => {
+    Produtos.find().lean().sort({date: "desc"}).then((produtos) => {
+        res.render("admin/produtos/produtos", {produtos: produtos})
+    }).catch((erro) => {
+        req.flash("error_msg", "Houve um erro ao listar os Produtos")
+        res.redirect("/admin")
+    })
+    
+})
+
+//Rota para adição de produtos através do painel de admin
+router.get("/produtos/add", eAdmin, (req,res) => {
+    //Irá popular o campo de categorias com todas as categorias criadas no banco
+    Categoria.find().lean().then((categoria) => {
+        res.render("admin/produtos/addproduto", {categoria: categoria})
+    }).catch((err) => {
+        req.flash("error_msg", "Houve um erro ao carregar o formulário.")
+        res.redirect("/admin")
+    })
+    
+})
+
+//Rota para editar os produtos no painel admin
+router.get("/produtos/edit/:id", eAdmin, (req, res) => {
+    //Findone é semelhante ao select, recebendo parametros de 'WHERE'
+    Produtos.findOne({_id: req.params.id}).lean().then((produtos) => {
+        Categoria.find().lean().then((categorias) => {
+            res.render("admin/produtos/editproduto", {categorias: categorias, produtos: produtos})
+
+        }).catch((err) => {
+            req.flash("error_msg", "Houve um erro ao listar as categorias")
+            res.redirect("/admin/produtos")
+        })
+    }).catch((err) => {
+        req.flash("error_msg", "Houve o erro ao carregar o formulário de edição.")
+        res.redirect("/admin/produtos")
+    })
+
+})
+
+
+// Enviar requisição de edição de categoria para o backend
+router.post("/produtos/edit", [eAdmin, upload.single("file"), (req, res) => {
+
+    //Procura a categoria e depois faz a edição no mongo
+    Produtos.findOne({_id: req.body.id}).then((produtos) => {
+        
+        produtos.nome =  req.body.nome
+        produtos.categoria = req.body.categoria
+        produtos.descricao = req.body.descricao
+        produtos.quantidade = req.body.quantidade
+        produtos.preco = req.body.preco
+        produtos.urlFoto = req.file.filename
+        produtos.slug =  req.body.slug
+        
+    Produtos.save().then(() => {
+            req.flash("success_msg", "Produto atualizado com sucesso.")
+            res.redirect("/admin/produtos/produtos")
+        
+        }).catch((err) => {
+            req.flash("error_msg", "Erro ao editar o produto.")
+            res.redirect("/admin/produtos")
+        })
+
+    }).catch((err) => {
+        req.flash("error_msg", "Houve um erro ao editar o produto")
+        res.redirect("/admin/produtos")
+    })
+
+
+
+}])
+
+// Rota tipo POST para enviar as informações para o banco de dados
+router.post("/produtos/nova", [eAdmin, upload.single("file"), (req, res) => {
+
+    //Array de erros para verificação do formulário
+    var erros = []
+
+    // ----- Validações para verificar se o formulário está preenchido corretamente
+    if(!req.body.nome || typeof req.body.nome == undefined || req.body.nome == null){
+        erros.push({texto: "Nome inválido"})
+    }
+
+    if(!req.body.slug || typeof req.body.slug == undefined || req.body.slug == null){
+        erros.push({texto: "Slug inválido"})
+    }
+    // ------ Fim da validação de formulário
+
+    if(erros.length > 0){
+        res.render("admin/produtos/addproduto", {erros: erros})
+    } else {
+
+        const novoProduto = {
+            nome: req.body.nome,
+            categoria: req.body.categoria,
+            descricao: req.body.descricao,
+            quantidade: req.body.quantidade,
+            preco: req.body.preco,
+            urlFoto: req.file.filename,
+            slug: req.body.slug
+        }
+    
+        new Produtos(novoProduto).save().then(() => {
+            //O flash irá enviar uma mensagem para nossas variaveis globais "success_msg" e "error_msg"
+            req.flash("success_msg", "Produto criado com sucesso.")
+            res.redirect("/admin/produtos")
+        }).catch((err) => {
+            req.flash("error_msg", "Erro ao salvar produto: " + err)
+            res.redirect("/admin")
+        })
+    }
+
+
+}])
+
+//Rota para excluir o produto no backend
+router.post("/produtos/deletar", eAdmin, (req, res) => {
+    Produtos.deleteOne({_id: req.body.id}).then(() => {
+        req.flash("success_msg", "Produto deletado com sucesso")
+        res.redirect("/admin/produtos")
+
+    }).catch((err) => {
+        req.flash("error_msg", "Houve um erro ao excluir o produto")
+        res.redirect("/admin/produtos")
+
+    })
 })
 
 // Rota das categorias de admin
